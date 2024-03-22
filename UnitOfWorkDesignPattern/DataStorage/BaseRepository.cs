@@ -1,4 +1,5 @@
-﻿using UnitOfWorkDesignPattern.Models.DatabaseObjects;
+﻿using Microsoft.EntityFrameworkCore;
+using UnitOfWorkDesignPattern.Models.DatabaseObjects;
 using UnitOfWorkDesignPattern.Models.DataTransferObjects;
 
 namespace UnitOfWorkDesignPattern.DataStorage;
