@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using UnitOfWorkDesignPattern.DataStorage;
 using UnitOfWorkDesignPattern.Models.MapperProfiles;
 
