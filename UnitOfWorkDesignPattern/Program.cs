@@ -7,8 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAutoMapper(typeof(OrderMapperProfile), typeof(ProductMapperProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDatabase");
-Console.WriteLine($"Connection string: {connectionString}");
-Console.WriteLine($"DB version: {ServerVersion.AutoDetect(connectionString)}");
 builder.Services.AddDbContext<ApplicationDataContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
     );

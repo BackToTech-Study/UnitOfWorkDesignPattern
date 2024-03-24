@@ -1,24 +1,26 @@
-using MockQueryable.Moq;
-using Moq;
 using UnitOfWorkDesignPattern.DataStorage;
-using UnitOfWorkDesignPattern.Models.DatabaseObjects;
 using UnitOfWorkDesignPattern.Models.DataTransferObjects;
+using UnitOfWorkDesignPattern.UnitTests.Mock;
 
 namespace UnitOfWorkDesignPattern.UnitTests;
 
 public class ProductRepositoryTests
 {
+    private readonly IDatabaseContextFactory _dbContextFactory;
+    public ProductRepositoryTests()
+    {
+        _dbContextFactory = new MockedDatabaseContextFactory();
+    }
+    
     [Fact]
     public void Count_EmptyDatabase_ReturnsZero()
     {
         // Arrange
-        var mock = new List<ProductDatabaseObject>().AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-                    .Returns(mock.Object);        
+        _dbContextFactory.SeedProducts(0);
+        var dataContext = _dbContextFactory.GetDataContext();
         
         // Act
-        var productRepository = new ProductRepository(dataContext.Object);
+        var productRepository = new ProductRepository(dataContext);
         
         // Assert
         Assert.Equal(0, productRepository.Count());
@@ -28,32 +30,23 @@ public class ProductRepositoryTests
     public void Count_PopulatedDatabase_ReturnsCount()
     {
         // Arrange
-        var databaseObjects = new List<ProductDatabaseObject>
-        {
-            new ProductDatabaseObject { Id = 1 },
-            new ProductDatabaseObject { Id = 2 },
-        };
-        var mock = databaseObjects.AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-            .Returns(mock.Object);        
+        var databaseObjects = _dbContextFactory.SeedProducts(2);
+        var dataContext = _dbContextFactory.GetDataContext();
         
         // Act
-        var productRepository = new ProductRepository(dataContext.Object);
+        var productRepository = new ProductRepository(dataContext);
         
         // Assert
-        Assert.Equal(databaseObjects.Count, productRepository.Count());
+        Assert.Equal(databaseObjects.Count(), productRepository.Count());
     }
     
     [Fact]
     public void GetCollection_EmptyDatabase_ReturnsEmptyCollection()
     {
         // Arrange
-        var mock = new List<ProductDatabaseObject>().AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-                    .Returns(mock.Object);        
-        var productRepository = new ProductRepository(dataContext.Object);
+        _dbContextFactory.SeedProducts(0);
+        var dataContext = _dbContextFactory.GetDataContext(); 
+        var productRepository = new ProductRepository(dataContext);
         var page = new Page()
         {
             PageNumber = 0,
@@ -71,16 +64,9 @@ public class ProductRepositoryTests
     public void GetCollection_PopulatedDatabase_ReturnsCollection()
     {
         // Arrange
-        var databaseObjects = new List<ProductDatabaseObject>
-        {
-            new ProductDatabaseObject { Id = 1 },
-            new ProductDatabaseObject { Id = 2 },
-        };
-        var mock = databaseObjects.AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-            .Returns(mock.Object);        
-        var productRepository = new ProductRepository(dataContext.Object);
+        var databaseObjects = _dbContextFactory.SeedProducts(2);
+        var dataContext = _dbContextFactory.GetDataContext();   
+        var productRepository = new ProductRepository(dataContext);
         var page = new Page()
         {
             PageNumber = 0,
@@ -101,11 +87,9 @@ public class ProductRepositoryTests
     public void GetCollection_NullPage_ThrowsArgumentNullException()
     {
         // Arrange
-        var mock = new List<ProductDatabaseObject>().AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-                    .Returns(mock.Object);        
-        var productRepository = new ProductRepository(dataContext.Object);
+        _dbContextFactory.SeedProducts(0);
+        var dataContext = _dbContextFactory.GetDataContext();        
+        var productRepository = new ProductRepository(dataContext);
         
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => productRepository.GetCollection(null));
@@ -115,11 +99,9 @@ public class ProductRepositoryTests
     public void GetCollection_PageNumberLessThanZero_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var mock = new List<ProductDatabaseObject>().AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-                    .Returns(mock.Object);        
-        var productRepository = new ProductRepository(dataContext.Object);
+        _dbContextFactory.SeedProducts(0);
+        var dataContext = _dbContextFactory.GetDataContext();        
+        var productRepository = new ProductRepository(dataContext);
         var page = new Page()
         {
             PageNumber = -1,
@@ -134,11 +116,9 @@ public class ProductRepositoryTests
     public void GetCollection_PageSizeLessThanOne_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var mock = new List<ProductDatabaseObject>().AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-                    .Returns(mock.Object);        
-        var productRepository = new ProductRepository(dataContext.Object);
+        _dbContextFactory.SeedProducts(0);
+        var dataContext = _dbContextFactory.GetDataContext();      
+        var productRepository = new ProductRepository(dataContext);
         var page = new Page()
         {
             PageNumber = 0,
@@ -153,16 +133,9 @@ public class ProductRepositoryTests
     public void GetCollection_PageSizeZero_ReturnsEmptyCollection()
     {
         // Arrange
-        var databaseObjects = new List<ProductDatabaseObject>
-        {
-            new ProductDatabaseObject { Id = 1 },
-            new ProductDatabaseObject { Id = 2 },
-        };
-        var mock = databaseObjects.AsQueryable().BuildMockDbSet();
-        var dataContext = new Mock<ApplicationDataContext>();
-        dataContext.Setup(x => x.Set<ProductDatabaseObject>())
-                    .Returns(mock.Object);        
-        var productRepository = new ProductRepository(dataContext.Object);
+        var databaseObjects = _dbContextFactory.SeedProducts(2);
+        var dataContext = _dbContextFactory.GetDataContext();          
+        var productRepository = new ProductRepository(dataContext);
         var page = new Page()
         {
             PageNumber = 0,
